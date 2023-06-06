@@ -8,6 +8,7 @@ The main use case is when you want to periodically pull something from a third-p
 
 + 🐍 Pure Python.
 + 🐎 asyncio-first with synchronous API available.
++ 🕐 Handles time changes, changes in timezones, system suspension, and other corner-cases.
 + 🛡 Fully type-annotated and type-safe.
 + 🪶 Zero-dependency.
 + 🔧 Highly configurable.
