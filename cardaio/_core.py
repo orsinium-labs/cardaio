@@ -61,7 +61,7 @@ class Heartbeat:
         elif start is None:
             start = (fastest + slowest) / 2
         assert fastest <= start <= slowest
-        assert self._ratio > 1
+        assert ratio > 1
 
         self._fastest: float = fastest
         self._slowest: float = slowest
