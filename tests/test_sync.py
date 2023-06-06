@@ -35,6 +35,15 @@ FAIL = False
     (dict(ratio=.5), FAIL),
     (dict(ratio=0), FAIL),
     (dict(ratio=-2), FAIL),
+
+    # start
+    (dict(fastest=2, start=3, slowest=6), OK),
+    (dict(fastest=2, start=timedelta(seconds=3), slowest=6), OK),
+    (dict(fastest=2, start=2, slowest=6), OK),
+    (dict(fastest=2, start=6, slowest=6), OK),
+    (dict(fastest=2, start=1, slowest=6), FAIL),
+    (dict(fastest=2, start=-2, slowest=6), FAIL),
+    (dict(fastest=2, start=8, slowest=6), FAIL),
 ])
 def test_init_assertions(given: dict, expected: bool) -> None:
     if expected is OK:
@@ -72,6 +81,13 @@ def test_slower(init: dict, expected: list[float]) -> None:
     assert delays == expected
 
 
+def test_delay():
+    hb = Heartbeat(fastest=1, start=13, slowest=120)
+    assert hb.delay == 13
+    hb.delay = 42
+    assert hb.delay == 42
+
+
 def test_sync_wait():
     hb = Heartbeat(start=.01)
     it = iter(hb)
@@ -90,3 +106,33 @@ def test_sync_wait():
     for _ in range(3):
         with duration_between(.01, .011):
             next(it)
+
+
+async def test_async_wait():
+    hb = Heartbeat(start=.01)
+    it = hb.__aiter__()
+    with duration_between(0, .001):
+        await it.__anext__()
+    for _ in range(3):
+        with duration_between(.01, .011):
+            await it.__anext__()
+
+    hb.slower()
+    for _ in range(3):
+        with duration_between(.02, .021):
+            await it.__anext__()
+
+    hb.faster()
+    for _ in range(3):
+        with duration_between(.01, .011):
+            await it.__anext__()
+
+
+async def test_async_loop():
+    hb = Heartbeat(start=.01)
+    with duration_between(.01, .011):
+        i = 0
+        async for _ in hb:
+            i += 1
+            if i == 2:
+                break
