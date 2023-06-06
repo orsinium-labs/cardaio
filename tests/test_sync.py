@@ -1,9 +1,13 @@
 from __future__ import annotations
+
 from datetime import timedelta
 
 import pytest
+
 from cardaio import Heartbeat
+
 from .helpers import duration_between
+
 
 OK = True
 FAIL = False

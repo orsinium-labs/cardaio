@@ -1,11 +1,9 @@
 from __future__ import annotations
+
 import asyncio
 import time
 from datetime import timedelta
-from typing import Awaitable, Callable
-
-
-Callback = Callable[[], None | Awaitable[None]]
+from typing import Callable
 
 
 class Heartbeat:
@@ -65,7 +63,6 @@ class Heartbeat:
 
         self._fastest: float = fastest
         self._slowest: float = slowest
-        self._callbacks: list[Callback] = []
         self._now: Callable[[], float] = now
         self._prev: float = -start
         self._ratio: float = ratio
