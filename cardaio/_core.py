@@ -137,19 +137,18 @@ class Heartbeat:
         # Wait in two steps: first half of the time and then the rest.
         # That way, if the machine is suspended during the wait,
         # the delay lag is just half of the delay value at worst.
-        elapsed = self._now() - self._prev
-        await asyncio.sleep((self._delay - elapsed) / 2)
-
-        elapsed = self._now() - self._prev
-        await asyncio.sleep(self._delay - elapsed)
-
+        await asyncio.sleep(self._get_pause() / 2)
+        await asyncio.sleep(self._get_pause())
         self._prev = self._now()
 
     def __next__(self) -> None:
-        elapsed = self._now() - self._prev
-        time.sleep((self._delay - elapsed) / 2)
-
-        elapsed = self._now() - self._prev
-        time.sleep(self._delay - elapsed)
-
+        time.sleep(self._get_pause() / 2)
+        time.sleep(self._get_pause())
         self._prev = self._now()
+
+    def _get_pause(self) -> float:
+        elapsed = self._now() - self._prev
+        pause = self._delay - elapsed
+        if pause <= 0:
+            return 0
+        return pause

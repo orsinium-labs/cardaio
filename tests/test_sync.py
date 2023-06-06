@@ -3,6 +3,7 @@ from datetime import timedelta
 
 import pytest
 from cardaio import Heartbeat
+from .helpers import duration_between
 
 OK = True
 FAIL = False
@@ -65,3 +66,23 @@ def test_slower(init: dict, expected: list[float]) -> None:
         delays.append(hb.delay)
         hb.slower()
     assert delays == expected
+
+
+def test_sync_wait():
+    hb = Heartbeat(start=.01)
+    it = iter(hb)
+    with duration_between(0, .001):
+        next(it)
+    for _ in range(3):
+        with duration_between(.01, .011):
+            next(it)
+
+    hb.slower()
+    for _ in range(3):
+        with duration_between(.02, .021):
+            next(it)
+
+    hb.faster()
+    for _ in range(3):
+        with duration_between(.01, .011):
+            next(it)
